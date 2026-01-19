@@ -27,6 +27,8 @@ import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedSystemIndexRouteImport } from './routes/_authenticated/system/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedRolesIndexRouteImport } from './routes/_authenticated/roles/index'
+import { Route as AuthenticatedRedemptionsIndexRouteImport } from './routes/_authenticated/redemptions/index'
+import { Route as AuthenticatedRatioSettingIndexRouteImport } from './routes/_authenticated/ratio-setting/index'
 import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects/index'
 import { Route as AuthenticatedPermissionDemoIndexRouteImport } from './routes/_authenticated/permission-demo/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
@@ -41,6 +43,7 @@ import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_a
 import { Route as AuthenticatedProjectUsersIndexRouteImport } from './routes/_authenticated/project/users/index'
 import { Route as AuthenticatedProjectUsageLogsIndexRouteImport } from './routes/_authenticated/project/usage-logs/index'
 import { Route as AuthenticatedProjectTracesIndexRouteImport } from './routes/_authenticated/project/traces/index'
+import { Route as AuthenticatedProjectTopupIndexRouteImport } from './routes/_authenticated/project/topup/index'
 import { Route as AuthenticatedProjectThreadsIndexRouteImport } from './routes/_authenticated/project/threads/index'
 import { Route as AuthenticatedProjectRolesIndexRouteImport } from './routes/_authenticated/project/roles/index'
 import { Route as AuthenticatedProjectRequestsIndexRouteImport } from './routes/_authenticated/project/requests/index'
@@ -142,6 +145,18 @@ const AuthenticatedRolesIndexRoute = AuthenticatedRolesIndexRouteImport.update({
   path: '/roles/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRedemptionsIndexRoute =
+  AuthenticatedRedemptionsIndexRouteImport.update({
+    id: '/redemptions/',
+    path: '/redemptions/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRatioSettingIndexRoute =
+  AuthenticatedRatioSettingIndexRouteImport.update({
+    id: '/ratio-setting/',
+    path: '/ratio-setting/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProjectsIndexRoute =
   AuthenticatedProjectsIndexRouteImport.update({
     id: '/projects/',
@@ -225,6 +240,12 @@ const AuthenticatedProjectTracesIndexRoute =
     path: '/project/traces/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProjectTopupIndexRoute =
+  AuthenticatedProjectTopupIndexRouteImport.update({
+    id: '/project/topup/',
+    path: '/project/topup/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProjectThreadsIndexRoute =
   AuthenticatedProjectThreadsIndexRouteImport.update({
     id: '/project/threads/',
@@ -299,6 +320,8 @@ export interface FileRoutesByFullPath {
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/permission-demo': typeof AuthenticatedPermissionDemoIndexRoute
   '/projects': typeof AuthenticatedProjectsIndexRoute
+  '/ratio-setting': typeof AuthenticatedRatioSettingIndexRoute
+  '/redemptions': typeof AuthenticatedRedemptionsIndexRoute
   '/roles': typeof AuthenticatedRolesIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/system': typeof AuthenticatedSystemIndexRoute
@@ -311,6 +334,7 @@ export interface FileRoutesByFullPath {
   '/project/requests': typeof AuthenticatedProjectRequestsIndexRoute
   '/project/roles': typeof AuthenticatedProjectRolesIndexRoute
   '/project/threads': typeof AuthenticatedProjectThreadsIndexRoute
+  '/project/topup': typeof AuthenticatedProjectTopupIndexRoute
   '/project/traces': typeof AuthenticatedProjectTracesIndexRoute
   '/project/usage-logs': typeof AuthenticatedProjectUsageLogsIndexRoute
   '/project/users': typeof AuthenticatedProjectUsersIndexRoute
@@ -339,6 +363,8 @@ export interface FileRoutesByTo {
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/permission-demo': typeof AuthenticatedPermissionDemoIndexRoute
   '/projects': typeof AuthenticatedProjectsIndexRoute
+  '/ratio-setting': typeof AuthenticatedRatioSettingIndexRoute
+  '/redemptions': typeof AuthenticatedRedemptionsIndexRoute
   '/roles': typeof AuthenticatedRolesIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/system': typeof AuthenticatedSystemIndexRoute
@@ -351,6 +377,7 @@ export interface FileRoutesByTo {
   '/project/requests': typeof AuthenticatedProjectRequestsIndexRoute
   '/project/roles': typeof AuthenticatedProjectRolesIndexRoute
   '/project/threads': typeof AuthenticatedProjectThreadsIndexRoute
+  '/project/topup': typeof AuthenticatedProjectTopupIndexRoute
   '/project/traces': typeof AuthenticatedProjectTracesIndexRoute
   '/project/usage-logs': typeof AuthenticatedProjectUsageLogsIndexRoute
   '/project/users': typeof AuthenticatedProjectUsersIndexRoute
@@ -382,6 +409,8 @@ export interface FileRoutesById {
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/permission-demo/': typeof AuthenticatedPermissionDemoIndexRoute
   '/_authenticated/projects/': typeof AuthenticatedProjectsIndexRoute
+  '/_authenticated/ratio-setting/': typeof AuthenticatedRatioSettingIndexRoute
+  '/_authenticated/redemptions/': typeof AuthenticatedRedemptionsIndexRoute
   '/_authenticated/roles/': typeof AuthenticatedRolesIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/system/': typeof AuthenticatedSystemIndexRoute
@@ -394,6 +423,7 @@ export interface FileRoutesById {
   '/_authenticated/project/requests/': typeof AuthenticatedProjectRequestsIndexRoute
   '/_authenticated/project/roles/': typeof AuthenticatedProjectRolesIndexRoute
   '/_authenticated/project/threads/': typeof AuthenticatedProjectThreadsIndexRoute
+  '/_authenticated/project/topup/': typeof AuthenticatedProjectTopupIndexRoute
   '/_authenticated/project/traces/': typeof AuthenticatedProjectTracesIndexRoute
   '/_authenticated/project/usage-logs/': typeof AuthenticatedProjectUsageLogsIndexRoute
   '/_authenticated/project/users/': typeof AuthenticatedProjectUsersIndexRoute
@@ -425,6 +455,8 @@ export interface FileRouteTypes {
     | '/help-center'
     | '/permission-demo'
     | '/projects'
+    | '/ratio-setting'
+    | '/redemptions'
     | '/roles'
     | '/settings/'
     | '/system'
@@ -437,6 +469,7 @@ export interface FileRouteTypes {
     | '/project/requests'
     | '/project/roles'
     | '/project/threads'
+    | '/project/topup'
     | '/project/traces'
     | '/project/usage-logs'
     | '/project/users'
@@ -465,6 +498,8 @@ export interface FileRouteTypes {
     | '/help-center'
     | '/permission-demo'
     | '/projects'
+    | '/ratio-setting'
+    | '/redemptions'
     | '/roles'
     | '/settings'
     | '/system'
@@ -477,6 +512,7 @@ export interface FileRouteTypes {
     | '/project/requests'
     | '/project/roles'
     | '/project/threads'
+    | '/project/topup'
     | '/project/traces'
     | '/project/usage-logs'
     | '/project/users'
@@ -507,6 +543,8 @@ export interface FileRouteTypes {
     | '/_authenticated/help-center/'
     | '/_authenticated/permission-demo/'
     | '/_authenticated/projects/'
+    | '/_authenticated/ratio-setting/'
+    | '/_authenticated/redemptions/'
     | '/_authenticated/roles/'
     | '/_authenticated/settings/'
     | '/_authenticated/system/'
@@ -519,6 +557,7 @@ export interface FileRouteTypes {
     | '/_authenticated/project/requests/'
     | '/_authenticated/project/roles/'
     | '/_authenticated/project/threads/'
+    | '/_authenticated/project/topup/'
     | '/_authenticated/project/traces/'
     | '/_authenticated/project/usage-logs/'
     | '/_authenticated/project/users/'
@@ -665,6 +704,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRolesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/redemptions/': {
+      id: '/_authenticated/redemptions/'
+      path: '/redemptions'
+      fullPath: '/redemptions'
+      preLoaderRoute: typeof AuthenticatedRedemptionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ratio-setting/': {
+      id: '/_authenticated/ratio-setting/'
+      path: '/ratio-setting'
+      fullPath: '/ratio-setting'
+      preLoaderRoute: typeof AuthenticatedRatioSettingIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/projects/': {
       id: '/_authenticated/projects/'
       path: '/projects'
@@ -763,6 +816,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectTracesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/project/topup/': {
+      id: '/_authenticated/project/topup/'
+      path: '/project/topup'
+      fullPath: '/project/topup'
+      preLoaderRoute: typeof AuthenticatedProjectTopupIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/project/threads/': {
       id: '/_authenticated/project/threads/'
       path: '/project/threads'
@@ -857,6 +917,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedPermissionDemoIndexRoute: typeof AuthenticatedPermissionDemoIndexRoute
   AuthenticatedProjectsIndexRoute: typeof AuthenticatedProjectsIndexRoute
+  AuthenticatedRatioSettingIndexRoute: typeof AuthenticatedRatioSettingIndexRoute
+  AuthenticatedRedemptionsIndexRoute: typeof AuthenticatedRedemptionsIndexRoute
   AuthenticatedRolesIndexRoute: typeof AuthenticatedRolesIndexRoute
   AuthenticatedSystemIndexRoute: typeof AuthenticatedSystemIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
@@ -868,6 +930,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProjectRequestsIndexRoute: typeof AuthenticatedProjectRequestsIndexRoute
   AuthenticatedProjectRolesIndexRoute: typeof AuthenticatedProjectRolesIndexRoute
   AuthenticatedProjectThreadsIndexRoute: typeof AuthenticatedProjectThreadsIndexRoute
+  AuthenticatedProjectTopupIndexRoute: typeof AuthenticatedProjectTopupIndexRoute
   AuthenticatedProjectTracesIndexRoute: typeof AuthenticatedProjectTracesIndexRoute
   AuthenticatedProjectUsageLogsIndexRoute: typeof AuthenticatedProjectUsageLogsIndexRoute
   AuthenticatedProjectUsersIndexRoute: typeof AuthenticatedProjectUsersIndexRoute
@@ -885,6 +948,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedPermissionDemoIndexRoute: AuthenticatedPermissionDemoIndexRoute,
   AuthenticatedProjectsIndexRoute: AuthenticatedProjectsIndexRoute,
+  AuthenticatedRatioSettingIndexRoute: AuthenticatedRatioSettingIndexRoute,
+  AuthenticatedRedemptionsIndexRoute: AuthenticatedRedemptionsIndexRoute,
   AuthenticatedRolesIndexRoute: AuthenticatedRolesIndexRoute,
   AuthenticatedSystemIndexRoute: AuthenticatedSystemIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
@@ -901,6 +966,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedProjectRequestsIndexRoute,
   AuthenticatedProjectRolesIndexRoute: AuthenticatedProjectRolesIndexRoute,
   AuthenticatedProjectThreadsIndexRoute: AuthenticatedProjectThreadsIndexRoute,
+  AuthenticatedProjectTopupIndexRoute: AuthenticatedProjectTopupIndexRoute,
   AuthenticatedProjectTracesIndexRoute: AuthenticatedProjectTracesIndexRoute,
   AuthenticatedProjectUsageLogsIndexRoute:
     AuthenticatedProjectUsageLogsIndexRoute,
