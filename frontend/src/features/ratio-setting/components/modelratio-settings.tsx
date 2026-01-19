@@ -36,7 +36,7 @@ const isValidJson = (value: string) => {
 const createFormSchema = (t: any) => z.object({
   ModelPrice: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
   ModelRatio: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
-  CacheRatio: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
+  // CacheRatio: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
   CompletionRatio: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
   ImageRatio: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
   AudioRatio: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
@@ -50,12 +50,7 @@ export function ModelRatioSettings() {
   const { t } = useTranslation();
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
-  // Enable mock data via localStorage
-  const useMockData = typeof window !== 'undefined'
-    ? localStorage.getItem('USE_MOCK_RATIO_DATA') === 'true'
-    : false;
-
-  const { data: ratioSettings, isLoading } = useRatioSettings({ useMockData });
+  const { data: ratioSettings, isLoading } = useRatioSettings();
   const { mutate: updateSettings } = useUpdateRatioSettings();
 
   const formSchema = useMemo(() => createFormSchema(t), [t]);
@@ -65,7 +60,7 @@ export function ModelRatioSettings() {
     defaultValues: {
       ModelPrice: '',
       ModelRatio: '',
-      CacheRatio: '',
+      // CacheRatio: '',
       CompletionRatio: '',
       ImageRatio: '',
       AudioRatio: '',
@@ -74,13 +69,13 @@ export function ModelRatioSettings() {
     },
   });
 
-  // Load data from backend/mock when available
+  // Load data from backend when available
   useEffect(() => {
     if (ratioSettings) {
       const formattedData = {
         ModelPrice: ratioSettings.ModelPrice || '{}',
         ModelRatio: ratioSettings.ModelRatio || '{}',
-        CacheRatio: ratioSettings.CacheRatio || '{}',
+        // CacheRatio: ratioSettings.CacheRatio || '{}',
         CompletionRatio: ratioSettings.CompletionRatio || '{}',
         ImageRatio: '{}', // Not in RatioSettings interface, keep empty
         AudioRatio: '{}', // Not in RatioSettings interface, keep empty
@@ -97,7 +92,7 @@ export function ModelRatioSettings() {
     updateSettings({
       ModelPrice: data.ModelPrice,
       ModelRatio: data.ModelRatio,
-      CacheRatio: data.CacheRatio,
+      // CacheRatio: data.CacheRatio,
       CompletionRatio: data.CompletionRatio,
     });
   }
@@ -152,7 +147,7 @@ export function ModelRatioSettings() {
               )}
             />
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name='CacheRatio'
               render={({ field }) => (
@@ -168,7 +163,7 @@ export function ModelRatioSettings() {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <FormField
               control={form.control}
@@ -189,7 +184,7 @@ export function ModelRatioSettings() {
               )}
             />
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name='ImageRatio'
               render={({ field }) => (
@@ -250,9 +245,9 @@ export function ModelRatioSettings() {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name='ExposeRatioEnabled'
               render={({ field }) => (
@@ -268,7 +263,7 @@ export function ModelRatioSettings() {
                   </FormControl>
                 </FormItem>
               )}
-            />
+            /> */}
           </div>
 
           <div className='flex items-center space-x-4'>

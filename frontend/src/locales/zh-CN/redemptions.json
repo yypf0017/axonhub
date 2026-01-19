@@ -13,7 +13,7 @@
       "used_times": "已使用次数"
     },
     "status": {
-      "unused": "未使用",
+      "active": "活跃的",
       "used": "已使用",
       "expired": "已过期",
       "unknown": "未知"

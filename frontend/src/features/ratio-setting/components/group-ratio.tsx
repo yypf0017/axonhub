@@ -46,14 +46,14 @@ const isValidJsonArray = (value: string) => {
 const createFormSchema = (t: any) => z.object({
   GroupRatio: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
   UserUsableGroups: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
-  GroupGroupRatio: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
-  'group_ratio_setting.group_special_usable_group': z.string().refine(isValidJson, {
-    message: t('ratioSetting.invalidJson'),
-  }),
-  AutoGroups: z.string().refine(isValidJsonArray, {
-    message: t('ratioSetting.groupRatioSettings.invalidJsonArray'),
-  }),
-  DefaultUseAutoGroup: z.boolean(),
+  // GroupGroupRatio: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
+  // 'group_ratio_setting.group_special_usable_group': z.string().refine(isValidJson, {
+  //   message: t('ratioSetting.invalidJson'),
+  // }),
+  // AutoGroups: z.string().refine(isValidJsonArray, {
+  //   message: t('ratioSetting.groupRatioSettings.invalidJsonArray'),
+  // }),
+  // DefaultUseAutoGroup: z.boolean(),
 });
 
 type FormValues = z.infer<ReturnType<typeof createFormSchema>>;
@@ -76,10 +76,10 @@ export function GroupRatioSettings() {
     defaultValues: {
       GroupRatio: '',
       UserUsableGroups: '',
-      GroupGroupRatio: '',
-      'group_ratio_setting.group_special_usable_group': '',
-      AutoGroups: '',
-      DefaultUseAutoGroup: false,
+      // GroupGroupRatio: '',
+      // 'group_ratio_setting.group_special_usable_group': '',
+      // AutoGroups: '',
+      // DefaultUseAutoGroup: false,
     },
   });
 
@@ -89,10 +89,10 @@ export function GroupRatioSettings() {
       const formattedData = {
         GroupRatio: ratioSettings.GroupRatio || '{}',
         UserUsableGroups: ratioSettings.UserUsableGroups || '{}',
-        GroupGroupRatio: ratioSettings.GroupGroupRatio || '{}',
-        'group_ratio_setting.group_special_usable_group': '{}',
-        AutoGroups: '[]',
-        DefaultUseAutoGroup: false,
+        // GroupGroupRatio: ratioSettings.GroupGroupRatio || '{}',
+        // 'group_ratio_setting.group_special_usable_group': '{}',
+        // AutoGroups: '[]',
+        // DefaultUseAutoGroup: false,
       };
 
       form.reset(formattedData);
@@ -104,7 +104,7 @@ export function GroupRatioSettings() {
     updateSettings({
       GroupRatio: data.GroupRatio,
       UserUsableGroups: data.UserUsableGroups,
-      GroupGroupRatio: data.GroupGroupRatio,
+      // GroupGroupRatio: data.GroupGroupRatio,
     });
   }
 
@@ -155,7 +155,7 @@ export function GroupRatioSettings() {
               )}
             />
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name='GroupGroupRatio'
               render={({ field }) => (
@@ -236,7 +236,7 @@ export function GroupRatioSettings() {
                   </FormControl>
                 </FormItem>
               )}
-            />
+            /> */}
           </div>
 
           <Button type='submit'>{t('ratioSetting.groupRatioSettings.saveGroupRatioSettings')}</Button>

@@ -3,6 +3,7 @@ import { graphqlRequest } from '@/gql/graphql';
 import { toast } from 'sonner';
 import i18n from '@/lib/i18n';
 import { useErrorHandler } from '@/hooks/use-error-handler';
+import { projectApi } from '@/lib/api-client';
 import { Project, ProjectConnection, CreateProjectInput, UpdateProjectInput, projectConnectionSchema, projectSchema } from './schema';
 
 // GraphQL queries and mutations
@@ -248,6 +249,31 @@ export function useActivateProject() {
       queryClient.invalidateQueries({ queryKey: ['project'] });
       queryClient.invalidateQueries({ queryKey: ['myProjects'] });
       toast.success(i18n.t('common.success.projectActivated'));
+    },
+  });
+}
+
+export function useRedeemProject() {
+  const queryClient = useQueryClient();
+  const { handleError } = useErrorHandler();
+
+  return useMutation({
+    mutationFn: async ({ id, code }: { id: string; code: string }) => {
+      try {
+        const response = await projectApi.redeem(id, code);
+        return response;
+      } catch (error) {
+        handleError(error, '兑换项目额度');
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      // Typically redemption updates project subscription/quota info, which might be separate from basic project info.
+      // But we invalidate relevant queries anyway.
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['project'] });
+      queryClient.invalidateQueries({ queryKey: ['myProjects'] });
+      toast.success(i18n.t('topup.redeem.success'));
     },
   });
 }

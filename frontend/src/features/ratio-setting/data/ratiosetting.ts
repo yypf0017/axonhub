@@ -2,17 +2,17 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import i18n from '@/lib/i18n';
 import { useErrorHandler } from '@/hooks/use-error-handler';
-import { pricingApi, PricingUpsertRequest } from '@/lib/api-client';
+import { pricingApi, PricingUpsertRequest, systemSettingsApi } from '@/lib/api-client';
 
 // Types
 export interface RatioSettings {
   ModelPrice: string;
   ModelRatio: string;
   CompletionRatio: string;
-  CacheRatio: string;
+  // CacheRatio: string;
   GroupRatio: string;
   UserUsableGroups: string;
-  GroupGroupRatio: string;
+  // GroupGroupRatio: string;
   ModelEnabled: string;
 }
 
@@ -20,102 +20,38 @@ export interface UpdateRatioSettingsInput {
   ModelPrice?: string;
   ModelRatio?: string;
   CompletionRatio?: string;
-  CacheRatio?: string;
+  // CacheRatio?: string;
   GroupRatio?: string;
   UserUsableGroups?: string;
-  GroupGroupRatio?: string;
+  // GroupGroupRatio?: string;
 }
 
-// Mock Data
-const MOCK_RATIO_SETTINGS: RatioSettings = {
-  ModelPrice: JSON.stringify({
-    'gpt-4': 0.03,
-    'gpt-4-32k': 0.06,
-    'gpt-3.5-turbo': 0.002,
-    'gpt-3.5-turbo-16k': 0.004,
-    'claude-3-opus': 0.015,
-    'claude-3-sonnet': 0.003,
-    'claude-3-haiku': 0.00025,
-    'gemini-pro': 0.0005,
-    'gemini-pro-vision': 0.0025,
-  }),
-  ModelRatio: JSON.stringify({
-    'gpt-4': 15,
-    'gpt-4-32k': 30,
-    'gpt-3.5-turbo': 1,
-    'gpt-3.5-turbo-16k': 2,
-    'claude-3-opus': 7.5,
-    'claude-3-sonnet': 1.5,
-    'claude-3-haiku': 0.125,
-    'gemini-pro': 0.25,
-    'gemini-pro-vision': 1.25,
-  }),
-  CompletionRatio: JSON.stringify({
-    'gpt-4': 1.5,
-    'gpt-4-32k': 2.0,
-    'gpt-3.5-turbo': 1.0,
-    'claude-3-opus': 1.5,
-    'claude-3-sonnet': 1.0,
-  }),
-  CacheRatio: JSON.stringify({
-    'gpt-4': 0.5,
-    'gpt-3.5-turbo': 0.5,
-    'claude-3-opus': 0.1,
-    'claude-3-sonnet': 0.1,
-  }),
-  GroupRatio: JSON.stringify({
-    'default': 1.0,
-    'premium': 0.8,
-    'enterprise': 0.6,
-    'trial': 1.5,
-  }),
-  UserUsableGroups: JSON.stringify({
-    'user1': ['default', 'premium'],
-    'user2': ['default'],
-    'user3': ['enterprise', 'premium'],
-  }),
-  GroupGroupRatio: JSON.stringify({
-    'default-premium': 1.2,
-    'premium-enterprise': 1.5,
-    'default-enterprise': 2.0,
-  }),
-  ModelEnabled: JSON.stringify({}),
-};
-
-// Hooks
-interface UseRatioSettingsOptions {
-  useMockData?: boolean;
-}
-
-export function useRatioSettings({ useMockData = false }: UseRatioSettingsOptions = {}) {
+export function useRatioSettings() {
   const { handleError } = useErrorHandler();
 
   return useQuery({
     queryKey: ['ratioSettings'],
     queryFn: async (): Promise<RatioSettings> => {
-      if (useMockData) {
-        return new Promise((resolve) => {
-          setTimeout(() => resolve(MOCK_RATIO_SETTINGS), 500);
-        });
-      }
-      
       try {
-        const response = await pricingApi.getPricing();
-        if (!response.success) {
-          console.warn('Failed to fetch pricing settings, falling back to mock data');
-          return MOCK_RATIO_SETTINGS;
+        const [pricingResponse, settingsResponse] = await Promise.all([
+          pricingApi.getPricing(),
+          systemSettingsApi.getSettings()
+        ]);
+
+        if (!pricingResponse.success) {
+          throw new Error('Failed to fetch pricing settings');
         }
 
         // Transform array data to object map for frontend compatibility
         const modelPrice: Record<string, number> = {};
         const modelRatio: Record<string, number> = {};
         const completionRatio: Record<string, number> = {};
-        const cacheRatio: Record<string, number> = {};
+        // const cacheRatio: Record<string, number> = {};
         const modelEnabled: Record<string, boolean> = {};
 
-        response.data.forEach(item => {
+        pricingResponse.data.forEach(item => {
           modelPrice[item.model] = item.price;
-          modelRatio[item.model] = item.quota;
+          modelRatio[item.model] = item.completion_ratio;
           completionRatio[item.model] = item.completion_ratio;
           
           if (item.status) {
@@ -125,20 +61,38 @@ export function useRatioSettings({ useMockData = false }: UseRatioSettingsOption
           }
         });
 
+        // Extract GroupRatio from system settings
+        let groupRatio = '{}';
+        let userUsableGroups = '{}';
+        if (settingsResponse && settingsResponse.settings) {
+          const groupRatioSetting = settingsResponse.settings.find(s => s.key === 'GroupRatio');
+          if (groupRatioSetting) {
+            groupRatio = typeof groupRatioSetting.value === 'string' 
+              ? groupRatioSetting.value 
+              : JSON.stringify(groupRatioSetting.value);
+          }
+          const userUsableGroupsSetting = settingsResponse.settings.find(s => s.key === 'user_selectable_groups');
+          if (userUsableGroupsSetting) {
+            userUsableGroups = typeof userUsableGroupsSetting.value === 'string'
+              ? userUsableGroupsSetting.value
+              : JSON.stringify(userUsableGroupsSetting.value);
+          }
+        }
+
         return {
           ModelPrice: JSON.stringify(modelPrice),
           ModelRatio: JSON.stringify(modelRatio),
           CompletionRatio: JSON.stringify(completionRatio),
-          CacheRatio: JSON.stringify(cacheRatio),
+          // CacheRatio: JSON.stringify(cacheRatio),
           ModelEnabled: JSON.stringify(modelEnabled),
           // These fields are not in pricing API yet, keeping empty or default
-          GroupRatio: '{}',
-          UserUsableGroups: '{}',
-          GroupGroupRatio: '{}',
+          GroupRatio: groupRatio,
+          UserUsableGroups: userUsableGroups,
+          // GroupGroupRatio: '{}',
         };
       } catch (error) {
-        console.warn('API error fetching pricing settings, falling back to mock data:', error);
-        return MOCK_RATIO_SETTINGS;
+        console.warn('API error fetching pricing settings:', error);
+        throw error;
       }
     },
   });
@@ -166,11 +120,39 @@ export function useUpdateRatioSettings() {
           model,
           type: 'quota', // Default type
           price: modelPrices[model] || 0,
-          quota: modelRatios[model] || 0,
-          completion_ratio: completionRatios[model] || 0,
+          quota: 0,
+          completion_ratio: modelRatios[model] || 0,
         };
         return pricingApi.updatePricing(data);
       });
+
+      // Update GroupRatio if present
+      if (input.GroupRatio) {
+        let value = input.GroupRatio;
+        try {
+          value = JSON.parse(input.GroupRatio);
+        } catch {
+          // keep as string if not valid JSON, though it should be validated by form
+        }
+        promises.push(systemSettingsApi.updateSettings({
+          key: 'GroupRatio',
+          value: value,
+        }));
+      }
+
+      // Update UserUsableGroups if present
+      if (input.UserUsableGroups) {
+        let value = input.UserUsableGroups;
+        try {
+          value = JSON.parse(input.UserUsableGroups);
+        } catch {
+          // keep as string if not valid JSON
+        }
+        promises.push(systemSettingsApi.updateSettings({
+          key: 'user_selectable_groups',
+          value: value,
+        }));
+      }
 
       await Promise.all(promises);
       return { success: true };

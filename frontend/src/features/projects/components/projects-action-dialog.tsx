@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { useProjectsContext } from '../context/projects-context';
-import { useCreateProject, useUpdateProject, useArchiveProject, useActivateProject } from '../data/projects';
+import { useCreateProject, useUpdateProject, useArchiveProject, useActivateProject, useRedeemProject } from '../data/projects';
 import { createProjectInputSchema, updateProjectInputSchema } from '../data/schema';
 
 // Create Project Dialog
@@ -272,6 +272,60 @@ export function ActivateProjectDialog() {
   );
 }
 
+// Redeem Project Dialog
+export function RedeemProjectDialog() {
+  const { t } = useTranslation();
+  const { redeemingProject, setRedeemingProject } = useProjectsContext();
+  const redeemProject = useRedeemProject();
+  const [code, setCode] = React.useState('');
+
+  const handleClose = () => {
+    setRedeemingProject(null);
+    setCode('');
+  };
+
+  const handleConfirm = async () => {
+    if (!redeemingProject || !code) return;
+
+    try {
+      await redeemProject.mutateAsync({ id: redeemingProject.id, code });
+      handleClose();
+    } catch (error) {
+      // Error is handled by the mutation
+    }
+  };
+
+  return (
+    <Dialog open={!!redeemingProject} onOpenChange={handleClose}>
+      <DialogContent className='max-w-md'>
+        <DialogHeader>
+          <DialogTitle>{t('topup.redeem.title')}</DialogTitle>
+          <DialogDescription>
+            {t('topup.redeem.description', { name: redeemingProject?.name })}
+          </DialogDescription>
+        </DialogHeader>
+        <div className='space-y-4 py-4'>
+          <div className='space-y-2'>
+            <Input
+              placeholder={t('topup.redeem.placeholder')}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type='button' variant='outline' onClick={handleClose}>
+            {t('common.buttons.cancel')}
+          </Button>
+          <Button type='submit' onClick={handleConfirm} disabled={!code || redeemProject.isPending}>
+            {redeemProject.isPending ? t('common.processing') : t('topup.redeem.button')}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // Combined Dialogs Component
 export function ProjectsDialogs() {
   return (
@@ -280,6 +334,7 @@ export function ProjectsDialogs() {
       <EditProjectDialog />
       <ArchiveProjectDialog />
       <ActivateProjectDialog />
+      <RedeemProjectDialog />
     </>
   );
 }

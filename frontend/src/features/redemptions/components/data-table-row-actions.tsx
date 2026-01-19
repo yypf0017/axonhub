@@ -52,12 +52,12 @@ export function DataTableRowActions<TData>({ row }: DataTableRowActionsProps<TDa
         <DropdownMenuContent align='end' className='w-[160px]'>
           {canVoid && (
             <DropdownMenuItem onSelect={() => setShowVoidDialog(true)}>
-              {t('common.void')}
+              {t('common.buttons.void')}
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => setShowDeleteDialog(true)}>
-            {t('common.delete')}
+            {t('common.buttons.delete')}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

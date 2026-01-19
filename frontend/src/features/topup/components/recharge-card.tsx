@@ -61,7 +61,7 @@ export function RechargeCard({ onOpenHistory }: RechargeCardProps) {
           </div>
         </div>
 
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="redeem-code">{t('topup.redeem.title')}</Label>
             <div className="flex space-x-2">
@@ -83,7 +83,7 @@ export function RechargeCard({ onOpenHistory }: RechargeCardProps) {
               </Button>
             </div>
           </div>
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   );

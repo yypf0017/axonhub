@@ -13,6 +13,8 @@ import {
   IconAB2,
   IconBaselineDensityMedium,
   IconAi,
+  IconRelationOneToOne,
+  IconCreditCard,
 } from '@tabler/icons-react';
 import { Command } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -99,6 +101,16 @@ export function useSidebarData(): SidebarData {
           url: '/roles',
           icon: IconShield,
         } as NavLink,
+        {
+          title: t('sidebar.items.ratioSetting'),
+          url: '/ratio-setting',
+          icon: IconSettings,
+        } as NavLink,
+        {
+          title: t('sidebar.items.redemptions'),
+          url: '/redemptions',
+          icon: IconRelationOneToOne,
+        } as NavLink,
         // {
         //   title: 'Permission Demo',
         //   url: '/permission-demo',
@@ -148,6 +160,11 @@ export function useSidebarData(): SidebarData {
           title: t('sidebar.items.playground'),
           url: '/project/playground',
           icon: IconRobot,
+        } as NavLink,
+        {
+          title: t('sidebar.items.topup'),
+          url: '/project/topup',
+          icon: IconCreditCard,
         } as NavLink,
       ],
     },

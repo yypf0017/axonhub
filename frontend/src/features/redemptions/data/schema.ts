@@ -9,19 +9,19 @@ export const redemptionSchema = z.object({
   status: redemptionStatusSchema,
   expires_at: z.string().nullable(),
   max_uses: z.number(),
-  used_times: z.number(),
-  voided: z.boolean(),
-  used_by: z.number().nullable(),
+  used_times: z.number().optional().default(0),
+  voided: z.boolean().optional().default(false),
+  used_by: z.number().nullable().optional(),
   used_at: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
-  deleted_at: z.number(),
+  deleted_at: z.number().optional().default(0),
 });
 
 export type Redemption = z.infer<typeof redemptionSchema>;
 
 export const redemptionListSchema = z.object({
-  success: z.boolean(),
+  success: z.boolean().optional().default(true),
   data: z.array(redemptionSchema),
 });
 

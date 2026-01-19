@@ -22,7 +22,10 @@
       "apiKeys": "API Keys",
       "playground": "Playground",
       "profile": "Profile",
-      "projects": "Projects"
+      "projects": "Projects",
+      "ratioSetting": "Pricing Setting",
+      "redemptions": "Redemptions Management",
+      "topup": "Topup Management"
     },
     "team": {
       "name": "AxonHub",
@@ -157,7 +160,9 @@
       "archiving": "Archiving...",
       "activate": "Activate",
       "activating": "Activating...",
-      "remove": "Remove"
+      "remove": "Remove",
+      "void": "Void",
+      "voiding": "Voiding..."
     },
     "actions": {
       "test": "Test",

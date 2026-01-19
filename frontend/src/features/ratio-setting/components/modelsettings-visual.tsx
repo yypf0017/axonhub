@@ -5,8 +5,9 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Edit, Trash2, Plus, Save, Search, AlertTriangle } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -39,6 +40,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 
 import { pricingApi, PricingUpsertRequest } from '@/lib/api-client';
 
@@ -53,7 +55,7 @@ interface ModelData {
 }
 
 interface ModelSettingsVisualEditorProps {
-  options: {
+  options?: {
     ModelPrice?: string;
     ModelRatio?: string;
     CompletionRatio?: string;
@@ -87,10 +89,18 @@ export default function ModelSettingsVisualEditor(props: ModelSettingsVisualEdit
   const [searchText, setSearchText] = useState('');
   const [conflictOnly, setConflictOnly] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [modelToDelete, setModelToDelete] = useState<string | null>(null);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
+
+  // Query to fetch pricing data
+  const { data: pricingData, refetch: refetchPricing } = useQuery({
+    queryKey: ['admin', 'pricing'],
+    queryFn: () => pricingApi.getPricing(),
+  });
 
   // Form for Dialog
   const modelFormSchema = useMemo(() => createModelFormSchema(t), [t]);
@@ -114,44 +124,43 @@ export default function ModelSettingsVisualEditor(props: ModelSettingsVisualEdit
   const pricingSubMode = form.watch('pricingSubMode');
   const modelTokenPrice = form.watch('modelTokenPrice');
 
-  // Initialize data from props
+  // Initialize data from API response
   useEffect(() => {
-    try {
-      const modelPrice = JSON.parse(props.options.ModelPrice || '{}');
-      const modelRatio = JSON.parse(props.options.ModelRatio || '{}');
-      const completionRatio = JSON.parse(props.options.CompletionRatio || '{}');
-      const modelEnabled = JSON.parse(props.options.ModelEnabled || '{}');
-
-      const modelNames = new Set([
-        ...Object.keys(modelPrice),
-        ...Object.keys(modelRatio),
-        ...Object.keys(completionRatio),
-        ...Object.keys(modelEnabled),
-      ]);
-
-      const modelData: ModelData[] = Array.from(modelNames).map((name) => {
-        const price = modelPrice[name] === undefined ? '' : String(modelPrice[name]);
-        const ratio = modelRatio[name] === undefined ? '' : String(modelRatio[name]);
-        const comp =
-          completionRatio[name] === undefined ? '' : String(completionRatio[name]);
-        const enabled = modelEnabled[name] !== undefined ? modelEnabled[name] : true;
+    if (pricingData?.data) {
+      const modelData: ModelData[] = pricingData.data.map((item) => {
+        const price = item.type === 'connection' ? String(item.price) : '';
+        const ratio = item.type === 'quota' ? String(item.quota) : '';
+        const comp = item.type === 'quota' ? String(item.completion_ratio) : '';
+        const enabled = item.status !== 'disabled';
 
         return {
-          name,
+          name: item.model,
           price,
           ratio,
           completionRatio: comp,
-          hasConflict: price !== '' && (ratio !== '' || comp !== ''),
+          hasConflict: false, // Conflicts are less likely with direct API mapping, but logic can be added if needed
           enabled,
         };
       });
-
       setModels(modelData);
-    } catch (error) {
-      console.error('JSON Parse Error:', error);
-      toast.error(t('ratioSetting.dataParseError'));
     }
-  }, [props.options, t]);
+  }, [pricingData]);
+
+  // Handle refresh
+  useEffect(() => {
+    if (props.refresh) {
+      // If parent triggers refresh, we should also refetch our data
+      // But props.refresh is a callback *we* call, not a signal to us usually.
+      // If we want to support external refresh signal, we'd need another prop or context.
+      // For now, assume this component manages its own data fetching.
+    }
+  }, [props.refresh]);
+
+  // Override props.refresh to also refetch local data
+  const handleRefresh = () => {
+    refetchPricing();
+    if (props.refresh) props.refresh();
+  };
 
   // Filtering
   const filteredModels = useMemo(() => {
@@ -211,17 +220,26 @@ export default function ModelSettingsVisualEditor(props: ModelSettingsVisualEdit
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (name: string) => {
-    if (confirm(t('ratioSetting.deleteDescription', { name }))) {
-      try {
-        await pricingApi.deleteModel(name);
-        setModels((prev) => prev.filter((m) => m.name !== name));
-        toast.success(t('ratioSetting.deleteSuccess'));
-        if (props.refresh) props.refresh();
-      } catch (error) {
-        console.error('Delete failed:', error);
-        toast.error(t('ratioSetting.deleteError'));
-      }
+  const handleDeleteClick = (name: string) => {
+    setModelToDelete(name);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!modelToDelete) return;
+    
+    try {
+      await pricingApi.deleteModel(modelToDelete);
+      setModels((prev) => prev.filter((m) => m.name !== modelToDelete));
+      toast.success(t('ratioSetting.deleteSuccess'));
+      if (props.refresh) props.refresh();
+      refetchPricing();
+    } catch (error) {
+      console.error('Delete failed:', error);
+      toast.error(t('ratioSetting.deleteError'));
+    } finally {
+      setDeleteDialogOpen(false);
+      setModelToDelete(null);
     }
   };
 
@@ -265,7 +283,7 @@ export default function ModelSettingsVisualEditor(props: ModelSettingsVisualEdit
     );
   };
 
-  const onDialogSubmit = (data: ModelFormValues) => {
+  const onDialogSubmit = async (data: ModelFormValues) => {
     const newModel: ModelData = {
       name: data.name,
       price: '',
@@ -298,29 +316,79 @@ export default function ModelSettingsVisualEditor(props: ModelSettingsVisualEdit
       (newModel.ratio !== '' || newModel.completionRatio !== '');
 
     if (isEditMode) {
-      setModels((prev) =>
-        prev.map((m) => (m.name === newModel.name ? newModel : m)),
-      );
-      toast.success(t('ratioSetting.updateSuccess'));
+      try {
+        const pricingRequest: PricingUpsertRequest = {
+          model: newModel.name,
+          type: newModel.price !== '' ? 'connection' : 'quota',
+          quota: newModel.ratio ? parseFloat(newModel.ratio) : 0,
+          price: newModel.price ? parseFloat(newModel.price) : 0,
+          completion_ratio: newModel.completionRatio ? parseFloat(newModel.completionRatio) : 0,
+        };
+
+        await pricingApi.updatePricing(pricingRequest);
+
+        setModels((prev) =>
+          prev.map((m) => (m.name === newModel.name ? newModel : m)),
+        );
+        toast.success(t('ratioSetting.updateSuccess'));
+        setIsDialogOpen(false);
+        refetchPricing();
+        if (props.refresh) props.refresh();
+      } catch (error) {
+        console.error('Update model failed:', error);
+        toast.error(t('ratioSetting.updateError'));
+      }
     } else {
+      // Create logic using batchCreatePricing API
       if (models.some((m) => m.name === newModel.name)) {
         toast.error(t('ratioSetting.modelNameExists'));
         return;
       }
-      setModels((prev) => [newModel, ...prev]);
-      toast.success(t('ratioSetting.addSuccess'));
+
+      try {
+        const pricingRequest: PricingUpsertRequest = {
+          model: newModel.name,
+          type: newModel.price !== '' ? 'connection' : 'quota',
+          quota: newModel.ratio ? parseFloat(newModel.ratio) : 0,
+          price: newModel.price ? parseFloat(newModel.price) : 0,
+          completion_ratio: newModel.completionRatio ? parseFloat(newModel.completionRatio) : 0,
+        };
+
+        await pricingApi.createPricing(pricingRequest);
+        
+        setModels((prev) => [newModel, ...prev]);
+        toast.success(t('ratioSetting.addSuccess'));
+        setIsDialogOpen(false);
+        refetchPricing();
+        if (props.refresh) props.refresh();
+      } catch (error) {
+        console.error('Create model failed:', error);
+        toast.error(t('ratioSetting.createError'));
+      }
     }
-    setIsDialogOpen(false);
   };
 
   const handleSaveAll = async () => {
     setLoading(true);
-    // Simulation of API call
-    console.log('Saving models:', models);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
-    toast.success(t('ratioSetting.saveSuccess'));
-    if (props.refresh) props.refresh();
+    try {
+      const items = models.map(model => ({
+        model: model.name,
+        type: model.price !== '' ? 'connection' : 'quota' as 'quota' | 'connection',
+        quota: model.ratio ? parseFloat(model.ratio) : 0,
+        price: model.price ? parseFloat(model.price) : 0,
+        completion_ratio: model.completionRatio ? parseFloat(model.completionRatio) : 0,
+      }));
+
+      await pricingApi.batchCreatePricing({ items });
+      toast.success(t('ratioSetting.saveAllSuccess'));
+      refetchPricing();
+      if (props.refresh) props.refresh();
+    } catch (error) {
+      console.error('Save all failed:', error);
+      toast.error(t('ratioSetting.saveError'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -467,7 +535,7 @@ export default function ModelSettingsVisualEditor(props: ModelSettingsVisualEdit
                         variant='ghost'
                         size='icon'
                         className='text-destructive'
-                        onClick={() => handleDelete(model.name)}
+                        onClick={() => handleDeleteClick(model.name)}
                       >
                         <Trash2 className='h-4 w-4' />
                       </Button>
@@ -591,10 +659,10 @@ export default function ModelSettingsVisualEditor(props: ModelSettingsVisualEdit
                             </FormItem>
                             <FormItem className='flex items-center space-x-2 space-y-0'>
                               <FormControl>
-                                <RadioGroupItem value='token-price' />
+                                <RadioGroupItem value='token-price' disabled />
                               </FormControl>
-                              <FormLabel className='font-normal'>
-                                {t('ratioSetting.visualEditor.setByPrice')}
+                              <FormLabel className='font-normal text-muted-foreground'>
+                                {t('ratioSetting.visualEditor.setByPrice')} (Coming Soon)
                               </FormLabel>
                             </FormItem>
                           </RadioGroup>
@@ -692,6 +760,17 @@ export default function ModelSettingsVisualEditor(props: ModelSettingsVisualEdit
           </Form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title={t('ratioSetting.confirmDelete')}
+        desc={t('ratioSetting.deleteDescription', { name: modelToDelete })}
+        confirmText={t('ratioSetting.confirm')}
+        cancelBtnText={t('ratioSetting.cancel')}
+        destructive
+        handleConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }

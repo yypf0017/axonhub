@@ -22,7 +22,10 @@
       "apiKeys": "API 密钥",
       "playground": "测试场",
       "profile": "个人资料",
-      "projects": "项目"
+      "projects": "项目",
+      "ratioSetting": "定价设置",
+      "redemptions": "兑换码管理",
+      "topup": "钱包管理"
     },
     "team": {
       "name": "AxonHub",
@@ -165,7 +168,9 @@
       "archiving": "归档中...",
       "activate": "激活",
       "activating": "激活中...",
-      "remove": "移除"
+      "remove": "移除",
+      "void": "作废",
+      "voiding": "作废中..."
     },
     "actions": {
       "openMenu": "打开菜单",
