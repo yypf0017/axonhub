@@ -18,6 +18,7 @@ const PROJECTS_QUERY = `
           name
           description
           status
+          group
         }
         cursor
       }
@@ -39,6 +40,7 @@ const CREATE_PROJECT_MUTATION = `
       name
       description
       status
+      group
       createdAt
       updatedAt
     }
@@ -52,6 +54,7 @@ const UPDATE_PROJECT_MUTATION = `
       name
       description
       status
+      group
       createdAt
       updatedAt
     }
@@ -65,6 +68,7 @@ const UPDATE_PROJECT_STATUS_MUTATION = `
       name
       description
       status
+      group
       createdAt
       updatedAt
     }
@@ -78,6 +82,7 @@ const MY_PROJECTS_QUERY = `
         name
         description
         status
+        group
         createdAt
         updatedAt
     }

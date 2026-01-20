@@ -41,6 +41,10 @@ export default defineConfig({
         target: process.env.VITE_API_URL || 'http://114.132.183.239:8090',
         changeOrigin: true,
       },
+      '/project': {
+        target: process.env.VITE_API_URL || 'http://114.132.183.239:8090',
+        changeOrigin: true,
+      },
     },
   },
 });

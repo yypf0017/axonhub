@@ -10,6 +10,7 @@
       "status": "Status",
       "createdAt": "Created At",
       "updatedAt": "Updated At",
+      "group": "Group",
       "actions": "Actions",
       "selectAll": "Select all",
       "selectRow": "Select row"
@@ -53,6 +54,11 @@
           "label": "Project Description",
           "placeholder": "Enter project description",
           "description": "Detailed description of the project"
+        },
+        "group": {
+          "label": "Billing Group",
+          "placeholder": "Select a group",
+          "description": "Billing group of the project"
         }
       },
       "buttons": {

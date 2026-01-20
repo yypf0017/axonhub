@@ -10,6 +10,7 @@
       "status": "状态",
       "createdAt": "创建时间",
       "updatedAt": "更新时间",
+      "group": "分组",
       "actions": "操作",
       "selectAll": "全选",
       "selectRow": "选择行"
@@ -53,6 +54,11 @@
           "label": "项目描述",
           "placeholder": "输入项目描述",
           "description": "项目的详细描述"
+        },
+        "group": {
+          "label": "计费分组",
+          "placeholder": "选择分组",
+          "description": "项目的计费分组"
         }
       },
       "buttons": {

@@ -1,8 +1,14 @@
 {
   "topup": {
-    "title": "充值中心",
-    "description": "管理您的项目账户余额和充值记录",
-    "balance": "当前项目余额",
+    "title": "额度中心",
+    "description": "管理您的项目账户额度和充值记录",
+    "balanceUsage": "额度使用情况 (已用/总额)",
+    "usage": {
+      "model": "模型",
+      "tokens": "Token数",
+      "cost": "消耗额度",
+      "time": "时间"
+    },
     "redeem": {
       "title": "兑换码充值",
       "placeholder": "请输入兑换码",

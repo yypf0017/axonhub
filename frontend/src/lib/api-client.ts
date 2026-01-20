@@ -529,62 +529,51 @@ export interface RedeemResponse {
 }
 
 export const projectApi = {
-  getSubscription: (projectId: number): Promise<SubscriptionResponse> =>
-    apiRequest('/project/billing/subscription' + buildQueryString({ project_id: projectId }), {
+  getSubscription: (projectId: string): Promise<SubscriptionResponse> =>
+    apiRequest('/project/billing/subscription', {
       method: 'GET',
+      headers: {
+        'X-Project-ID': projectId,
+      },
       requireAuth: true,
     }),
 
-  getUsage: (projectId: number, params: { page?: number; page_size?: number } = {}): Promise<UsageResponse> =>
-    apiRequest('/project/billing/usage' + buildQueryString({ project_id: projectId, ...params }), {
+  getUsage: (projectId: string, params: { page?: number; page_size?: number } = {}): Promise<UsageResponse> =>
+    apiRequest('/project/billing/usage' + buildQueryString(params), {
       method: 'GET',
+      headers: {
+        'X-Project-ID': projectId,
+      },
       requireAuth: true,
     }),
 
-  getDashboardStats: (projectId: number): Promise<DashboardStatsResponse> =>
-    apiRequest('/project/dashboard/stats' + buildQueryString({ project_id: projectId }), {
+  getDashboardStats: (projectId: string, params: { start_date?: string; end_date?: string } = {}): Promise<DashboardStatsResponse> =>
+    apiRequest('/project/dashboard/stats' + buildQueryString(params), {
       method: 'GET',
+      headers: {
+        'X-Project-ID': projectId,
+      },
       requireAuth: true,
     }),
 
-  getRecharges: (projectId: number, params: { page?: number; page_size?: number } = {}): Promise<RechargeListResponse> =>
-    apiRequest('/project/recharges' + buildQueryString({ project_id: projectId, ...params }), {
+  getRecharges: (projectId: string, params: { page?: number; page_size?: number } = {}): Promise<RechargeListResponse> =>
+    apiRequest('/project/recharges' + buildQueryString(params), {
       method: 'GET',
+      headers: {
+        'X-Project-ID': projectId,
+      },
       requireAuth: true,
     }),
 
   redeem: (projectId: string, code: string): Promise<RedeemResponse> =>
     apiRequest('/project/redemption/redeem', {
       method: 'POST',
-      body: { project_id:projectId,code },
-      requireAuth: true,
-      
-    }),
-};
-
-export const userPortalApi = {
-  getSubscription: (): Promise<SubscriptionResponse> =>
-    apiRequest('/user/billing/subscription', {
-      method: 'GET',
-      requireAuth: true,
-    }),
-
-  getUsage: (params: { page?: number; page_size?: number } = {}): Promise<UsageResponse> =>
-    apiRequest('/user/billing/usage' + buildQueryString(params), {
-      method: 'GET',
-      requireAuth: true,
-    }),
-
-  getRecharges: (params: { page?: number; page_size?: number } = {}): Promise<RechargeListResponse> =>
-    apiRequest('/user/recharges' + buildQueryString(params), {
-      method: 'GET',
-      requireAuth: true,
-    }),
-
-  redeem: (code: string): Promise<RedeemResponse> =>
-    apiRequest('/user/redemption/redeem', {
-      method: 'POST',
+      headers: {
+        'X-Project-ID': projectId,
+      },
       body: { code },
       requireAuth: true,
     }),
 };
+
+

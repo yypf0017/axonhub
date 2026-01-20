@@ -2,7 +2,13 @@
   "topup": {
     "title": "Top-up Center",
     "description": "Manage your account balance and top-up history",
-    "balance": "Current Balance",
+    "balanceUsage": "Quota Usage (Used / Total)",
+    "usage": {
+      "model": "Model",
+      "tokens": "Tokens",
+      "cost": "Cost",
+      "time": "Time"
+    },
     "redeem": {
       "title": "Redeem Code",
       "placeholder": "Enter redemption code",

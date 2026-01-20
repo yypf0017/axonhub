@@ -10,22 +10,51 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { useProjectsContext } from '../context/projects-context';
 import { useCreateProject, useUpdateProject, useArchiveProject, useActivateProject, useRedeemProject } from '../data/projects';
 import { createProjectInputSchema, updateProjectInputSchema } from '../data/schema';
+import { useQuery } from '@tanstack/react-query';
+import { systemSettingsApi } from '@/lib/api-client';
+
+// Hook to fetch user selectable groups
+function useUserSelectableGroups() {
+  return useQuery({
+    queryKey: ['systemSettings', 'user_selectable_groups'],
+    queryFn: async () => {
+      const response = await systemSettingsApi.getSettings();
+      const setting = response.settings.find((s) => s.key === 'user_selectable_groups');
+      if (setting && setting.value && typeof setting.value === 'object') {
+        // Handle both array and object formats
+        if (Array.isArray(setting.value)) {
+          return setting.value.map((v) => ({ label: v, value: v }));
+        }
+        // Handle object format: { "key": "Label" }
+        return Object.entries(setting.value).map(([key, label]) => ({
+          label: label as string,
+          value: key,
+        }));
+      }
+      return [];
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
 
 // Create Project Dialog
 export function CreateProjectDialog() {
   const { t } = useTranslation();
   const { isCreateDialogOpen, setIsCreateDialogOpen } = useProjectsContext();
   const createProject = useCreateProject();
+  const { data: groups } = useUserSelectableGroups();
 
   const form = useForm<z.infer<typeof createProjectInputSchema>>({
     resolver: zodResolver(createProjectInputSchema),
     defaultValues: {
       name: '',
       description: '',
+      group: undefined,
     },
   });
 
@@ -91,6 +120,34 @@ export function CreateProjectDialog() {
               )}
             />
 
+            {groups && groups.length > 0 && (
+              <FormField
+                control={form.control}
+                name='group'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('projects.dialogs.fields.group.label') || 'Group'}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || undefined}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t('projects.dialogs.fields.group.placeholder') || 'Select a group'} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {groups.map((group) => (
+                          <SelectItem key={group.value} value={group.value}>
+                            {group.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>{t('projects.dialogs.fields.group.description') || 'Select the billing group for this project'}</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <DialogFooter>
               <Button type='button' variant='outline' onClick={handleClose}>
                 {t('common.buttons.cancel')}
@@ -111,12 +168,14 @@ export function EditProjectDialog() {
   const { t } = useTranslation();
   const { editingProject, setEditingProject } = useProjectsContext();
   const updateProject = useUpdateProject();
+  const { data: groups } = useUserSelectableGroups();
 
   const form = useForm<z.infer<typeof updateProjectInputSchema>>({
     resolver: zodResolver(updateProjectInputSchema),
     defaultValues: {
       name: '',
       description: '',
+      group: undefined,
     },
   });
 
@@ -125,9 +184,10 @@ export function EditProjectDialog() {
       form.reset({
         name: editingProject.name,
         description: editingProject.description || '',
+        group: editingProject.group || undefined,
       });
     }
-  }, [editingProject, form]);
+  }, [editingProject, form.reset]);
 
   const onSubmit = async (values: z.infer<typeof updateProjectInputSchema>) => {
     if (!editingProject) return;
@@ -194,6 +254,34 @@ export function EditProjectDialog() {
               )}
             />
 
+            {groups && groups.length > 0 && (
+              <FormField
+                control={form.control}
+                name='group'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('projects.dialogs.fields.group.label') || 'Group'}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || undefined}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t('projects.dialogs.fields.group.placeholder') || 'Select a group'} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {groups.map((group) => (
+                          <SelectItem key={group.value} value={group.value}>
+                            {group.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>{t('projects.dialogs.fields.group.description') || 'Select the billing group for this project'}</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <DialogFooter>
               <Button type='button' variant='outline' onClick={handleClose}>
                 {t('common.buttons.cancel')}
@@ -215,28 +303,26 @@ export function ArchiveProjectDialog() {
   const { archivingProject, setArchivingProject } = useProjectsContext();
   const archiveProject = useArchiveProject();
 
-  const handleConfirm = async () => {
-    if (!archivingProject) return;
+  if (!archivingProject) return null;
 
+  const handleConfirm = async () => {
     try {
       await archiveProject.mutateAsync(archivingProject.id);
       setArchivingProject(null);
-    } catch (error) {
-      // Error is handled by the mutation
-    }
+    } catch (error) {}
   };
 
   return (
     <ConfirmDialog
       open={!!archivingProject}
-      onOpenChange={() => setArchivingProject(null)}
+      onOpenChange={(open) => !open && setArchivingProject(null)}
       title={t('projects.dialogs.archive.title')}
-      desc={t('projects.dialogs.archive.description', { name: archivingProject?.name })}
+      desc={t('projects.dialogs.archive.description', { name: archivingProject.name })}
       confirmText={t('common.buttons.archive')}
       cancelBtnText={t('common.buttons.cancel')}
+      destructive
       handleConfirm={handleConfirm}
       isLoading={archiveProject.isPending}
-      destructive
     />
   );
 }
@@ -247,23 +333,21 @@ export function ActivateProjectDialog() {
   const { activatingProject, setActivatingProject } = useProjectsContext();
   const activateProject = useActivateProject();
 
-  const handleConfirm = async () => {
-    if (!activatingProject) return;
+  if (!activatingProject) return null;
 
+  const handleConfirm = async () => {
     try {
       await activateProject.mutateAsync(activatingProject.id);
       setActivatingProject(null);
-    } catch (error) {
-      // Error is handled by the mutation
-    }
+    } catch (error) {}
   };
 
   return (
     <ConfirmDialog
       open={!!activatingProject}
-      onOpenChange={() => setActivatingProject(null)}
+      onOpenChange={(open) => !open && setActivatingProject(null)}
       title={t('projects.dialogs.activate.title')}
-      desc={t('projects.dialogs.activate.description', { name: activatingProject?.name })}
+      desc={t('projects.dialogs.activate.description', { name: activatingProject.name })}
       confirmText={t('common.buttons.activate')}
       cancelBtnText={t('common.buttons.cancel')}
       handleConfirm={handleConfirm}
@@ -279,34 +363,34 @@ export function RedeemProjectDialog() {
   const redeemProject = useRedeemProject();
   const [code, setCode] = React.useState('');
 
+  if (!redeemingProject) return null;
+
   const handleClose = () => {
     setRedeemingProject(null);
     setCode('');
   };
 
   const handleConfirm = async () => {
-    if (!redeemingProject || !code) return;
-
+    if (!code) return;
     try {
       await redeemProject.mutateAsync({ id: redeemingProject.id, code });
       handleClose();
-    } catch (error) {
-      // Error is handled by the mutation
-    }
+    } catch (error) {}
   };
 
   return (
     <Dialog open={!!redeemingProject} onOpenChange={handleClose}>
-      <DialogContent className='max-w-md'>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{t('topup.redeem.title')}</DialogTitle>
           <DialogDescription>
-            {t('topup.redeem.description', { name: redeemingProject?.name })}
+            {t('projects.dialogs.redeem.description', { defaultValue: 'Enter the redemption code for project {{name}}', name: redeemingProject.name })}
           </DialogDescription>
         </DialogHeader>
-        <div className='space-y-4 py-4'>
-          <div className='space-y-2'>
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
             <Input
+              id="code"
               placeholder={t('topup.redeem.placeholder')}
               value={code}
               onChange={(e) => setCode(e.target.value)}
@@ -314,10 +398,10 @@ export function RedeemProjectDialog() {
           </div>
         </div>
         <DialogFooter>
-          <Button type='button' variant='outline' onClick={handleClose}>
+          <Button variant="outline" onClick={handleClose}>
             {t('common.buttons.cancel')}
           </Button>
-          <Button type='submit' onClick={handleConfirm} disabled={!code || redeemProject.isPending}>
+          <Button onClick={handleConfirm} disabled={!code || redeemProject.isPending}>
             {redeemProject.isPending ? t('common.processing') : t('topup.redeem.button')}
           </Button>
         </DialogFooter>
@@ -326,7 +410,7 @@ export function RedeemProjectDialog() {
   );
 }
 
-// Combined Dialogs Component
+// ProjectsDialogs
 export function ProjectsDialogs() {
   return (
     <>

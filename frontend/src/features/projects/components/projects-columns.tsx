@@ -74,6 +74,14 @@ export const createColumns = (t: ReturnType<typeof useTranslation>['t'], canWrit
       },
     },
     {
+      accessorKey: 'group',
+      header: t('projects.columns.group'),
+      cell: ({ row }) => {
+        const group = row.getValue('group') as string;
+        return <div className='text-muted-foreground'>{group || '-'}</div>;
+      },
+    },
+    {
       accessorKey: 'createdAt',
       header: t('projects.columns.createdAt'),
       cell: ({ row }) => {

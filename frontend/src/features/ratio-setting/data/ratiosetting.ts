@@ -51,7 +51,7 @@ export function useRatioSettings() {
 
         pricingResponse.data.forEach(item => {
           modelPrice[item.model] = item.price;
-          modelRatio[item.model] = item.completion_ratio;
+          modelRatio[item.model] = item.quota;
           completionRatio[item.model] = item.completion_ratio;
           
           if (item.status) {
@@ -120,8 +120,8 @@ export function useUpdateRatioSettings() {
           model,
           type: 'quota', // Default type
           price: modelPrices[model] || 0,
-          quota: 0,
-          completion_ratio: modelRatios[model] || 0,
+          quota: modelRatios[model] || 0,
+          completion_ratio: completionRatios[model] || 0,
         };
         return pricingApi.updatePricing(data);
       });

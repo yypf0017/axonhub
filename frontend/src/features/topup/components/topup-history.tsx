@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -10,39 +10,42 @@ import {
 import { TopupHistoryTable } from './topup-history-table';
 import { createColumns } from './topup-history-columns';
 import { useTopupHistory } from '../data/topup';
-import { usePaginationSearch } from '@/hooks/use-pagination-search';
 
 interface TopupHistoryProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  projectId?: string;
 }
 
-export function TopupHistory({ open, onOpenChange }: TopupHistoryProps) {
+export function TopupHistory({ open, onOpenChange, projectId }: TopupHistoryProps) {
   const { t } = useTranslation();
-  const { pageSize, setCursors, setPageSize, paginationArgs } = usePaginationSearch({
-    defaultPageSize: 10,
-    pageSizeStorageKey: 'topup-history-page-size',
-  });
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-  const { data, isLoading } = useTopupHistory(paginationArgs);
+  const { data, isLoading } = useTopupHistory({ page, pageSize, projectId });
 
   const columns = useMemo(() => createColumns(t), [t]);
 
   const handleNextPage = () => {
-    if (data?.pageInfo?.hasNextPage && data?.pageInfo?.endCursor) {
-      setCursors(data.pageInfo.startCursor ?? undefined, data.pageInfo.endCursor ?? undefined, 'after');
+    if (data?.pageInfo?.hasNextPage) {
+      setPage((p) => p + 1);
     }
   };
 
   const handlePreviousPage = () => {
     if (data?.pageInfo?.hasPreviousPage) {
-      setCursors(data.pageInfo.startCursor ?? undefined, data.pageInfo.endCursor ?? undefined, 'before');
+      setPage((p) => Math.max(1, p - 1));
     }
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPage(1);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
+      <DialogContent className="sm:max-w-6xl h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{t('topup.history.title')}</DialogTitle>
           <DialogDescription>{t('topup.history.description')}</DialogDescription>
@@ -57,7 +60,7 @@ export function TopupHistory({ open, onOpenChange }: TopupHistoryProps) {
             totalCount={data?.totalCount}
             onNextPage={handleNextPage}
             onPreviousPage={handlePreviousPage}
-            onPageSizeChange={setPageSize}
+            onPageSizeChange={handlePageSizeChange}
           />
         </div>
       </DialogContent>

@@ -11,22 +11,27 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TableSkeleton } from '@/components/ui/table-skeleton';
-import { TopupHistoryItem, TopupHistoryConnection } from '../data/schema';
+import { ConsumptionRecord } from '@/lib/api-client';
 import { ServerSidePagination } from '@/components/server-side-pagination';
 
-interface DataTableProps {
-  columns: ColumnDef<TopupHistoryItem>[];
-  data: TopupHistoryItem[];
+interface UsageHistoryTableProps {
+  columns: ColumnDef<ConsumptionRecord>[];
+  data: ConsumptionRecord[];
   loading?: boolean;
-  pageInfo?: TopupHistoryConnection['pageInfo'];
-  pageSize: number;
+  pageInfo?: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    startCursor?: string | null;
+    endCursor?: string | null;
+  };
+  pageSize?: number;
   totalCount?: number;
-  onNextPage: () => void;
-  onPreviousPage: () => void;
-  onPageSizeChange: (pageSize: number) => void;
+  onNextPage?: () => void;
+  onPreviousPage?: () => void;
+  onPageSizeChange?: (pageSize: number) => void;
 }
 
-export function TopupHistoryTable({
+export function UsageHistoryTable({
   columns,
   data,
   loading,
@@ -36,7 +41,7 @@ export function TopupHistoryTable({
   onNextPage,
   onPreviousPage,
   onPageSizeChange,
-}: DataTableProps) {
+}: UsageHistoryTableProps) {
   const { t } = useTranslation();
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -116,16 +121,18 @@ export function TopupHistoryTable({
           </TableBody>
         </Table>
       </div>
-      <ServerSidePagination
-        totalCount={totalCount || 0}
-        pageSize={pageSize}
-        dataLength={data.length}
-        selectedRows={Object.keys(rowSelection).length}
-        pageInfo={pageInfo}
-        onNextPage={onNextPage}
-        onPreviousPage={onPreviousPage}
-        onPageSizeChange={onPageSizeChange}
-      />
+      {onNextPage && onPreviousPage && onPageSizeChange && pageSize && (
+        <ServerSidePagination
+          totalCount={totalCount || 0}
+          pageSize={pageSize}
+          dataLength={data.length}
+          selectedRows={Object.keys(rowSelection).length}
+          pageInfo={pageInfo}
+          onNextPage={onNextPage}
+          onPreviousPage={onPreviousPage}
+          onPageSizeChange={onPageSizeChange}
+        />
+      )}
     </div>
   );
 }
