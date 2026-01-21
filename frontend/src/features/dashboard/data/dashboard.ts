@@ -291,10 +291,10 @@ export function useTokenStats() {
             totalCachedTokensToday: dayStats.data.total_tokens,
             totalInputTokensThisWeek: weekStats.data.prompt_tokens,
             totalOutputTokensThisWeek: weekStats.data.completion_tokens,
-            totalCachedTokensThisWeek: dayStats.data.total_tokens,
+            totalCachedTokensThisWeek: weekStats.data.total_tokens,
             totalInputTokensThisMonth: monthStats.data.prompt_tokens,
             totalOutputTokensThisMonth: monthStats.data.completion_tokens,
-            totalCachedTokensThisMonth: dayStats.data.total_tokens,
+            totalCachedTokensThisMonth: monthStats.data.total_tokens,
           };
         }
         throw new Error('Failed to fetch dashboard stats');
