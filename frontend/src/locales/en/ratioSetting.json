@@ -130,7 +130,9 @@
       "autoGroups": "Auto Groups (Selects from the first available)",
       "defaultUseAutoGroup": "Default to 'auto' group for new tokens",
       "defaultUseAutoGroupDesc": "Initial token will also be set to 'auto' (otherwise empty, defaulting to user's group).",
-      "saveGroupRatioSettings": "Save Group Ratio Settings"
+      "saveGroupRatioSettings": "Save Group Ratio Settings",
+      "contentSafety": "Content Safety Interception",
+      "contentSafetyDesc": "Whether to enable content safety interception, which will check user inputs for safety."
     },
     "visualEditor": {
       "showConflictOnly": "Show Conflicts Only",

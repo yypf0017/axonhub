@@ -12,7 +12,7 @@ export interface RatioSettings {
   // CacheRatio: string;
   GroupRatio: string;
   UserUsableGroups: string;
-  // GroupGroupRatio: string;
+  GroupGroupRatio: string;
   ModelEnabled: string;
 }
 
@@ -23,7 +23,7 @@ export interface UpdateRatioSettingsInput {
   // CacheRatio?: string;
   GroupRatio?: string;
   UserUsableGroups?: string;
-  // GroupGroupRatio?: string;
+  GroupGroupRatio?: string;
 }
 
 export function useRatioSettings() {
@@ -64,6 +64,7 @@ export function useRatioSettings() {
         // Extract GroupRatio from system settings
         let groupRatio = '{}';
         let userUsableGroups = '{}';
+        let groupGroupRatio = '{}';
         if (settingsResponse && settingsResponse.settings) {
           const groupRatioSetting = settingsResponse.settings.find(s => s.key === 'GroupRatio');
           if (groupRatioSetting) {
@@ -77,6 +78,12 @@ export function useRatioSettings() {
               ? userUsableGroupsSetting.value
               : JSON.stringify(userUsableGroupsSetting.value);
           }
+          const groupGroupRatioSetting = settingsResponse.settings.find(s => s.key === 'content_safety_intercept_enabled');
+          if (groupGroupRatioSetting) {
+            groupGroupRatio = typeof groupGroupRatioSetting.value === 'string'
+              ? groupGroupRatioSetting.value
+              : JSON.stringify(groupGroupRatioSetting.value);
+          }
         }
 
         return {
@@ -88,7 +95,7 @@ export function useRatioSettings() {
           // These fields are not in pricing API yet, keeping empty or default
           GroupRatio: groupRatio,
           UserUsableGroups: userUsableGroups,
-          // GroupGroupRatio: '{}',
+          GroupGroupRatio: groupGroupRatio,
         };
       } catch (error) {
         console.warn('API error fetching pricing settings:', error);
@@ -150,6 +157,19 @@ export function useUpdateRatioSettings() {
         }
         promises.push(systemSettingsApi.updateSettings({
           key: 'user_selectable_groups',
+          value: value,
+        }));
+      }
+
+      if (input.GroupGroupRatio) {
+        let value = input.GroupGroupRatio;
+        try {
+          value = JSON.parse(input.GroupGroupRatio);
+        } catch {
+          // keep as string if not valid JSON
+        }
+        promises.push(systemSettingsApi.updateSettings({
+          key: 'content_safety_intercept_enabled',
           value: value,
         }));
       }
