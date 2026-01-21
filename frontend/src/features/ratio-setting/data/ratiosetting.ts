@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { toast } from 'sonner';
 import i18n from '@/lib/i18n';
 import { useErrorHandler } from '@/hooks/use-error-handler';
@@ -26,27 +27,22 @@ export interface UpdateRatioSettingsInput {
   GroupGroupRatio?: string;
 }
 
-export function useRatioSettings() {
+export function useModelRatioSettings() {
   const { handleError } = useErrorHandler();
 
   return useQuery({
-    queryKey: ['ratioSettings'],
-    queryFn: async (): Promise<RatioSettings> => {
+    queryKey: ['modelRatioSettings'],
+    queryFn: async () => {
       try {
-        const [pricingResponse, settingsResponse] = await Promise.all([
-          pricingApi.getPricing(),
-          systemSettingsApi.getSettings()
-        ]);
+        const pricingResponse = await pricingApi.getPricing();
 
         if (!pricingResponse.success) {
           throw new Error('Failed to fetch pricing settings');
         }
 
-        // Transform array data to object map for frontend compatibility
         const modelPrice: Record<string, number> = {};
         const modelRatio: Record<string, number> = {};
         const completionRatio: Record<string, number> = {};
-        // const cacheRatio: Record<string, number> = {};
         const modelEnabled: Record<string, boolean> = {};
 
         pricingResponse.data.forEach(item => {
@@ -61,10 +57,34 @@ export function useRatioSettings() {
           }
         });
 
+        return {
+          ModelPrice: JSON.stringify(modelPrice),
+          ModelRatio: JSON.stringify(modelRatio),
+          CompletionRatio: JSON.stringify(completionRatio),
+          ModelEnabled: JSON.stringify(modelEnabled),
+        };
+      } catch (error) {
+        console.warn('API error fetching pricing settings:', error);
+        throw error;
+      }
+    },
+  });
+}
+
+export function useGroupRatioSettings() {
+  const { handleError } = useErrorHandler();
+
+  return useQuery({
+    queryKey: ['groupRatioSettings'],
+    queryFn: async () => {
+      try {
+        const settingsResponse = await systemSettingsApi.getSettings();
+
         // Extract GroupRatio from system settings
         let groupRatio = '{}';
         let userUsableGroups = '{}';
         let groupGroupRatio = '{}';
+        
         if (settingsResponse && settingsResponse.settings) {
           const groupRatioSetting = settingsResponse.settings.find(s => s.key === 'GroupRatio');
           if (groupRatioSetting) {
@@ -87,22 +107,36 @@ export function useRatioSettings() {
         }
 
         return {
-          ModelPrice: JSON.stringify(modelPrice),
-          ModelRatio: JSON.stringify(modelRatio),
-          CompletionRatio: JSON.stringify(completionRatio),
-          // CacheRatio: JSON.stringify(cacheRatio),
-          ModelEnabled: JSON.stringify(modelEnabled),
-          // These fields are not in pricing API yet, keeping empty or default
           GroupRatio: groupRatio,
           UserUsableGroups: userUsableGroups,
           GroupGroupRatio: groupGroupRatio,
         };
       } catch (error) {
-        console.warn('API error fetching pricing settings:', error);
+        console.warn('API error fetching system settings:', error);
         throw error;
       }
     },
   });
+}
+
+export function useRatioSettings() {
+  const modelSettings = useModelRatioSettings();
+  const groupSettings = useGroupRatioSettings();
+
+  const data = useMemo(() => {
+    if (!modelSettings.data || !groupSettings.data) return undefined;
+    return {
+      ...modelSettings.data,
+      ...groupSettings.data,
+    } as RatioSettings;
+  }, [modelSettings.data, groupSettings.data]);
+
+  return {
+    data,
+    isLoading: modelSettings.isLoading || groupSettings.isLoading,
+    error: modelSettings.error || groupSettings.error,
+    isError: modelSettings.isError || groupSettings.isError,
+  };
 }
 
 export function useUpdateRatioSettings() {
@@ -180,6 +214,8 @@ export function useUpdateRatioSettings() {
     onSuccess: () => {
       toast.success(i18n.t('ratioSetting.updateSuccess'));
       queryClient.invalidateQueries({ queryKey: ['ratioSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['modelRatioSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['groupRatioSettings'] });
     },
     onError: (error) => {
       handleError(error);

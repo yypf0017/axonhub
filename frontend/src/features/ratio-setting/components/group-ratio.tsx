@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/form';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { useRatioSettings, useUpdateRatioSettings } from '../data/ratiosetting';
+import { useGroupRatioSettings, useUpdateRatioSettings } from '../data/ratiosetting';
 
 // Helper to validate JSON string
 const isValidJson = (value: string) => {
@@ -61,12 +61,7 @@ type FormValues = z.infer<ReturnType<typeof createFormSchema>>;
 export function GroupRatioSettings() {
   const { t } = useTranslation();
 
-  // Enable mock data via localStorage
-  const useMockData = typeof window !== 'undefined'
-    ? localStorage.getItem('USE_MOCK_RATIO_DATA') === 'true'
-    : false;
-
-  const { data: ratioSettings } = useRatioSettings({ useMockData });
+  const { data: ratioSettings } = useGroupRatioSettings();
   const { mutate: updateSettings } = useUpdateRatioSettings();
 
   const formSchema = useMemo(() => createFormSchema(t), [t]);
