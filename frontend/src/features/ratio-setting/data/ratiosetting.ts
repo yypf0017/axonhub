@@ -122,7 +122,7 @@ export function useUpdateRatioSettings() {
       // Note: This is a simplified implementation. In a real scenario,
       // we might want to diff the changes or have a bulk update endpoint.
       
-      const promises = Object.keys(modelPrices).map(async (model) => {
+      const promises: Promise<unknown>[] = Object.keys(modelPrices).map(async (model) => {
         const data: PricingUpsertRequest = {
           model,
           type: 'quota', // Default type

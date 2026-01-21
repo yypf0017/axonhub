@@ -22,12 +22,7 @@ export function RatioSettingTabs({ initialTab }: RatioSettingTabsProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<RatioTabKey>('ModelRatio');
 
-  // Enable mock data via localStorage or environment variable
-  const useMockData = typeof window !== 'undefined'
-    ? localStorage.getItem('USE_MOCK_RATIO_DATA') === 'true'
-    : false;
-
-  const { data: ratioSettings, isLoading } = useRatioSettings({ useMockData });
+  const { data: ratioSettings, isLoading } = useRatioSettings();
 
   useEffect(() => {
     if (initialTab) {
