@@ -130,9 +130,7 @@
       "autoGroups": "自动分组auto，从第一个开始选择",
       "defaultUseAutoGroup": "创建令牌默认选择auto分组",
       "defaultUseAutoGroupDesc": "初始令牌也将设为auto（否则留空，为用户默认分组）",
-      "saveGroupRatioSettings": "保存分组倍率设置",
-      "contentSafety": "内容安全拦截",
-      "contentSafetyDesc": "是否开启内容安全拦截，开启后将对用户输入进行安全检查"
+      "saveGroupRatioSettings": "保存分组倍率设置"
     },
     "visualEditor": {
       "showConflictOnly": "仅显示矛盾倍率",

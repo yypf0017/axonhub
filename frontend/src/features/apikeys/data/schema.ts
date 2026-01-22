@@ -21,7 +21,8 @@ export const apiKeySchema = z.object({
   type: apiKeyTypeSchema,
   status: apiKeyStatusSchema,
   scopes: z.array(z.string()).optional().nullable(),
-  // Optional profiles for detailed view (may be omitted in list queries)
+  ipWhitelist: z.string().optional().nullable(),
+  contentSafetyInterceptEnabled: z.boolean().optional(),
   profiles: z
     .object({
       activeProfile: z.string(),
@@ -66,14 +67,17 @@ export const createApiKeyInputSchemaFactory = (t: (key: string) => string) =>
     name: z.string().min(1, t('apikeys.validation.nameRequired')),
     type: apiKeyTypeSchema.optional(),
     scopes: z.array(z.string()).optional(),
+    ipWhitelist: z.string().optional(),
+    contentSafetyInterceptEnabled: z.boolean().optional(),
     projectID: z.number().optional(),
   });
 
-// Default schema for backward compatibility
 export const createApiKeyInputSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   type: apiKeyTypeSchema.optional(),
   scopes: z.array(z.string()).optional(),
+  ipWhitelist: z.string().optional(),
+  contentSafetyInterceptEnabled: z.boolean().optional(),
   projectID: z.number().optional(),
 });
 export type CreateApiKeyInput = z.infer<typeof createApiKeyInputSchema>;
@@ -83,12 +87,17 @@ export const updateApiKeyInputSchemaFactory = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t('apikeys.validation.nameRequired')).optional(),
     scopes: z.array(z.string()).optional(),
+    ipWhitelist: z.string().optional(),
+    clearIPWhitelist: z.boolean().optional(),
+    contentSafetyInterceptEnabled: z.boolean().optional(),
   });
 
-// Default schema for backward compatibility
 export const updateApiKeyInputSchema = z.object({
   name: z.string().min(1, 'Name is required').optional(),
   scopes: z.array(z.string()).optional(),
+  ipWhitelist: z.string().optional(),
+  clearIPWhitelist: z.boolean().optional(),
+  contentSafetyInterceptEnabled: z.boolean().optional(),
 });
 export type UpdateApiKeyInput = z.infer<typeof updateApiKeyInputSchema>;
 

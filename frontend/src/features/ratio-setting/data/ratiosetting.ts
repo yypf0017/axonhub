@@ -13,7 +13,7 @@ export interface RatioSettings {
   // CacheRatio: string;
   GroupRatio: string;
   UserUsableGroups: string;
-  GroupGroupRatio: string;
+  // GroupGroupRatio: string;
   ModelEnabled: string;
 }
 
@@ -24,7 +24,7 @@ export interface UpdateRatioSettingsInput {
   // CacheRatio?: string;
   GroupRatio?: string;
   UserUsableGroups?: string;
-  GroupGroupRatio?: string;
+  // GroupGroupRatio?: string;
 }
 
 export function useModelRatioSettings() {
@@ -83,7 +83,7 @@ export function useGroupRatioSettings() {
         // Extract GroupRatio from system settings
         let groupRatio = '{}';
         let userUsableGroups = '{}';
-        let groupGroupRatio = '{}';
+        // let groupGroupRatio = '{}';
         
         if (settingsResponse && settingsResponse.settings) {
           const groupRatioSetting = settingsResponse.settings.find(s => s.key === 'GroupRatio');
@@ -98,18 +98,13 @@ export function useGroupRatioSettings() {
               ? userUsableGroupsSetting.value
               : JSON.stringify(userUsableGroupsSetting.value);
           }
-          const groupGroupRatioSetting = settingsResponse.settings.find(s => s.key === 'content_safety_intercept_enabled');
-          if (groupGroupRatioSetting) {
-            groupGroupRatio = typeof groupGroupRatioSetting.value === 'string'
-              ? groupGroupRatioSetting.value
-              : JSON.stringify(groupGroupRatioSetting.value);
-          }
+          
         }
 
         return {
           GroupRatio: groupRatio,
           UserUsableGroups: userUsableGroups,
-          GroupGroupRatio: groupGroupRatio,
+          // GroupGroupRatio: groupGroupRatio,
         };
       } catch (error) {
         console.warn('API error fetching system settings:', error);
@@ -195,18 +190,18 @@ export function useUpdateRatioSettings() {
         }));
       }
 
-      if (input.GroupGroupRatio) {
-        let value = input.GroupGroupRatio;
-        try {
-          value = JSON.parse(input.GroupGroupRatio);
-        } catch {
-          // keep as string if not valid JSON
-        }
-        promises.push(systemSettingsApi.updateSettings({
-          key: 'content_safety_intercept_enabled',
-          value: value,
-        }));
-      }
+      // if (input.GroupGroupRatio) {
+      //   let value = input.GroupGroupRatio;
+      //   try {
+      //     value = JSON.parse(input.GroupGroupRatio);
+      //   } catch {
+      //     // keep as string if not valid JSON
+      //   }
+      //   promises.push(systemSettingsApi.updateSettings({
+      //     key: 'content_safety_intercept_enabled',
+      //     value: value,
+      //   }));
+      // }
 
       await Promise.all(promises);
       return { success: true };

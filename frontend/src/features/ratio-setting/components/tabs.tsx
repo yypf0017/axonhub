@@ -37,7 +37,7 @@ export function RatioSettingTabs({ initialTab }: RatioSettingTabsProps) {
     CacheRatio: '{}',
     GroupRatio: '{}',
     UserUsableGroups: '{}',
-    GroupGroupRatio: '{}',
+    // GroupGroupRatio: '{}',
     ModelEnabled: '{}',
   };
 

@@ -32,6 +32,8 @@ function buildApiKeysQuery(permissions: { canViewUsers: boolean }) {
             type
             status
             scopes
+            ipWhitelist
+            contentSafetyInterceptEnabled
           }
           cursor
         }
@@ -69,6 +71,8 @@ function buildApiKeyQuery(permissions: { canViewUsers: boolean }) {
         type
         status
         scopes
+        ipWhitelist
+        contentSafetyInterceptEnabled
         profiles {
           activeProfile
           profiles {
@@ -106,6 +110,8 @@ function buildCreateApiKeyMutation(permissions: { canViewUsers: boolean }) {
         type
         status
         scopes
+        ipWhitelist
+        contentSafetyInterceptEnabled
       }
     }
   `;
@@ -132,6 +138,8 @@ function buildUpdateApiKeyMutation(permissions: { canViewUsers: boolean }) {
         type
         status
         scopes
+        ipWhitelist
+        contentSafetyInterceptEnabled
       }
     }
   `;

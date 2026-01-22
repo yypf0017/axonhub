@@ -46,7 +46,7 @@ const isValidJsonArray = (value: string) => {
 const createFormSchema = (t: any) => z.object({
   GroupRatio: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
   UserUsableGroups: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
-  GroupGroupRatio: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
+  // GroupGroupRatio: z.string().refine(isValidJson, { message: t('ratioSetting.invalidJson') }),
   // 'group_ratio_setting.group_special_usable_group': z.string().refine(isValidJson, {
   //   message: t('ratioSetting.invalidJson'),
   // }),
@@ -71,7 +71,7 @@ export function GroupRatioSettings() {
     defaultValues: {
       GroupRatio: '',
       UserUsableGroups: '',
-      GroupGroupRatio: '',
+      // GroupGroupRatio: '',
       // 'group_ratio_setting.group_special_usable_group': '',
       // AutoGroups: '',
       // DefaultUseAutoGroup: false,
@@ -84,7 +84,7 @@ export function GroupRatioSettings() {
       const formattedData = {
         GroupRatio: ratioSettings.GroupRatio || '{}',
         UserUsableGroups: ratioSettings.UserUsableGroups || '{}',
-        GroupGroupRatio: ratioSettings.GroupGroupRatio || '{}',
+        // GroupGroupRatio: ratioSettings.GroupGroupRatio || '{}',
         // 'group_ratio_setting.group_special_usable_group': '{}',
         // AutoGroups: '[]',
         // DefaultUseAutoGroup: false,
@@ -99,7 +99,7 @@ export function GroupRatioSettings() {
     updateSettings({
       GroupRatio: data.GroupRatio,
       UserUsableGroups: data.UserUsableGroups,
-      GroupGroupRatio: data.GroupGroupRatio,
+      // GroupGroupRatio: data.GroupGroupRatio,
     });
   }
 
@@ -144,27 +144,6 @@ export function GroupRatioSettings() {
                   </FormControl>
                   <FormDescription>
                     {t('ratioSetting.groupRatioSettings.userUsableGroupsDesc')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='GroupGroupRatio'
-              render={({ field }) => (
-                <FormItem className='max-w-3xl'>
-                  <FormLabel>{t('ratioSetting.groupRatioSettings.contentSafety')}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder={t('ratioSetting.groupRatioSettings.jsonText')}
-                      className='min-h-[150px] font-mono'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('ratioSetting.groupRatioSettings.contentSafetyDesc')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

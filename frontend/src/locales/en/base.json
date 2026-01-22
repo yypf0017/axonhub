@@ -128,6 +128,9 @@
     "dragging": "Dragging",
     "unsavedChanges": "You have unsaved changes",
     "copied": "Copied",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "unknown": "Unknown",
     "sort": {
       "ascending": "Ascending",
       "descending": "Descending",
