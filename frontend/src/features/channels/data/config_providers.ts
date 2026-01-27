@@ -21,6 +21,7 @@ import {
   Bailian,
   Jina,
   DeepInfra,
+  Hunyuan,
 } from '@lobehub/icons';
 import { CHANNEL_CONFIGS } from './config_channels';
 import { ApiFormat, ChannelType } from './schema';
@@ -170,6 +171,12 @@ export const PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
     icon: Jina,
     color: 'bg-purple-100 text-purple-800 border-purple-200',
     channelTypes: ['jina'],
+  },
+  hunyuan: {
+    provider: 'hunyuan',
+    icon: Hunyuan,
+    color: 'bg-purple-100 text-purple-800 border-purple-200',
+    channelTypes: ['hunyuan'],
   },
 };
 

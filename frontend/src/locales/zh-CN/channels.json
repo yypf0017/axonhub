@@ -73,7 +73,8 @@
       "burncloud": "BurnCloud",
       "modelscope": "魔搭",
       "bailian": "百炼",
-      "jina": "Jina"
+      "jina": "Jina",
+      "hunyuan": "Hunyuan"
     },
     "providers": {
       "openai": "OpenAI",
@@ -97,7 +98,8 @@
       "burncloud": "BurnCloud",
       "modelscope": "魔搭",
       "bailian": "百炼",
-      "jina": "Jina"
+      "jina": "Jina",
+      "hunyuan": "Hunyuan"
     },
     "actions": {
       "test": "测试",

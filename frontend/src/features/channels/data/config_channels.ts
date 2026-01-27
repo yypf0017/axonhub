@@ -21,6 +21,7 @@ import {
   Bailian,
   Jina,
   DeepInfra,
+  Hunyuan
 } from '@lobehub/icons';
 import { BURNCLOUD_DEFAULT_MODELS } from './burncloud-models';
 import { ApiFormat, ChannelType } from './schema';
@@ -443,6 +444,14 @@ export const CHANNEL_CONFIGS: Record<ChannelType, ChannelConfig> = {
     color: 'bg-purple-100 text-purple-800 border-purple-200',
     icon: Jina,
   },
+  hunyuan: {
+    channelType: 'hunyuan',
+    baseURL: 'https://api.hunyuan.cloud.tencent.com/v1',
+    defaultModels: ['hunyuan-turbos-latest', 'hunyuan-vision'],
+    apiFormat: OPENAI_CHAT_COMPLETIONS,
+    color: 'bg-purple-100 text-purple-800 border-purple-200',
+    icon: Hunyuan,
+  },
 };
 
 /**
@@ -484,7 +493,8 @@ export type Provider =
   | 'burncloud'
   | 'modelscope'
   | 'bailian'
-  | 'jina';
+  | 'jina'
+  | 'hunyuan';
 
 /**
  * Map channel type to provider
@@ -526,6 +536,7 @@ export const CHANNEL_TYPE_TO_PROVIDER: Record<ChannelType, Provider> = {
   modelscope: 'modelscope',
   bailian: 'bailian',
   jina: 'jina',
+  hunyuan: 'hunyuan',
 };
 
 /**
