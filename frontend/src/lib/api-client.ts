@@ -499,6 +499,12 @@ export interface ConsumptionRecord {
 export interface UsageResponse {
   success: boolean;
   data: ConsumptionRecord[];
+  pagination?: {
+    total: number;
+    offset: number;
+    limit: number;
+  };
+  total?: number;
 }
 
 export interface DashboardStatsData {
@@ -538,7 +544,7 @@ export const projectApi = {
       requireAuth: true,
     }),
 
-  getUsage: (projectId: string, params: { page?: number; page_size?: number } = {}): Promise<UsageResponse> =>
+  getUsage: (projectId: string, params: { offset?: number; limit?: number } = {}): Promise<UsageResponse> =>
     apiRequest('/project/billing/usage' + buildQueryString(params), {
       method: 'GET',
       headers: {

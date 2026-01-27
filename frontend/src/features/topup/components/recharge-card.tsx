@@ -15,10 +15,15 @@ interface RechargeCardProps {
 
 export function RechargeCard({ onOpenHistory, projectId }: RechargeCardProps) {
   const { t } = useTranslation();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+
   const { data: subscription } = useProjectSubscription(projectId);
-  const { data: usageData, isLoading } = useProjectUsage(projectId, 1, 5); // Fetch first 5 records
+  const { data: usageData, isLoading } = useProjectUsage(projectId, page, pageSize);
 
   const columns = useMemo(() => createUsageColumns(t), [t]);
+
+  const totalCount = usageData?.pagination?.total || usageData?.total || 0;
 
   return (
     <Card className="w-full">
@@ -50,6 +55,16 @@ export function RechargeCard({ onOpenHistory, projectId }: RechargeCardProps) {
           columns={columns}
           data={usageData?.data || []}
           loading={isLoading}
+          pageInfo={{
+            hasNextPage: page * pageSize < totalCount,
+            hasPreviousPage: page > 1,
+          }}
+          
+          pageSize={pageSize}
+          totalCount={totalCount}
+          onNextPage={() => setPage((p) => p + 1)}
+          onPreviousPage={() => setPage((p) => Math.max(1, p - 1))}
+          onPageSizeChange={setPageSize}
         />
       </CardContent>
     </Card>

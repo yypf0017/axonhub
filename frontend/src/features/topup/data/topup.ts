@@ -100,7 +100,8 @@ export function useProjectUsage(projectId?: string, page = 1, pageSize = 10) {
     queryFn: async () => {
       if (!projectId) return { success: false, data: [] };
       try {
-        const response = await projectApi.getUsage(projectId, { page, page_size: pageSize });
+        const offset = (page - 1) * pageSize;
+        const response = await projectApi.getUsage(projectId, { offset, limit: pageSize });
         if (!response.success) {
           throw new Error('Failed to load usage');
         }
